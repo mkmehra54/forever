@@ -15,21 +15,24 @@ const Collection = () => {
   const toggleCategory = (e) => {
     const value = e.target.value;
     setCategory((prev) =>
-      prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
+      prev.includes(value)
+        ? prev.filter((item) => item !== value)
+        : [...prev, value]
     );
   };
 
   const toggleSubCategory = (e) => {
     const value = e.target.value;
     setSubCategory((prev) =>
-      prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
+      prev.includes(value)
+        ? prev.filter((item) => item !== value)
+        : [...prev, value]
     );
   };
 
   const applyFilters = () => {
     let productsCopy = [...products];
 
-    // Smarter search logic
     if (showSearch && search) {
       const searchTerm = search.toLowerCase().trim();
       const searchWords = searchTerm.split(/\s+/);
@@ -57,21 +60,18 @@ const Collection = () => {
       });
     }
 
-    // Apply category filter
     if (category.length > 0) {
       productsCopy = productsCopy.filter((item) =>
         category.includes(item.category)
       );
     }
 
-    // Apply subcategory filter
     if (subCategory.length > 0) {
       productsCopy = productsCopy.filter((item) =>
         subCategory.includes(item.subCategory)
       );
     }
 
-    // Apply sorting after filtering
     sortProducts(productsCopy);
   };
 
@@ -91,12 +91,24 @@ const Collection = () => {
   };
 
   useEffect(() => {
-    applyFilters();
+    if (products && products.length > 0) {
+      applyFilters();
+    }
   }, [category, subCategory, search, showSearch, products]);
 
   useEffect(() => {
-    sortProducts(filterProducts);
+    if (filterProducts.length > 0) {
+      sortProducts(filterProducts);
+    }
   }, [sortType]);
+
+  if (!products || products.length === 0) {
+    return (
+      <p className="text-center py-20 text-gray-400 text-xl">
+        Loading products...
+      </p>
+    );
+  }
 
   return (
     <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t">
