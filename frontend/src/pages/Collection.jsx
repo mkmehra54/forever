@@ -10,29 +10,26 @@ const Collection = () => {
   const [filterProducts, setFilterProducts] = useState([]);
   const [category, setCategory] = useState([]);
   const [subCategory, setSubCategory] = useState([]);
-  const [sortType, setSortType] = useState("relavent");
+  const [sortType, setSortType] = useState("relevant");
 
   const toggleCategory = (e) => {
     const value = e.target.value;
     setCategory((prev) =>
-      prev.includes(value)
-        ? prev.filter((item) => item !== value)
-        : [...prev, value]
+      prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
     );
   };
 
   const toggleSubCategory = (e) => {
     const value = e.target.value;
     setSubCategory((prev) =>
-      prev.includes(value)
-        ? prev.filter((item) => item !== value)
-        : [...prev, value]
+      prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
     );
   };
 
   const applyFilters = () => {
     let productsCopy = [...products];
 
+    // Search logic
     if (showSearch && search) {
       const searchTerm = search.toLowerCase().trim();
       const searchWords = searchTerm.split(/\s+/);
@@ -60,23 +57,27 @@ const Collection = () => {
       });
     }
 
+    // Category filter
     if (category.length > 0) {
       productsCopy = productsCopy.filter((item) =>
         category.includes(item.category)
       );
     }
 
+    // Subcategory filter
     if (subCategory.length > 0) {
       productsCopy = productsCopy.filter((item) =>
         subCategory.includes(item.subCategory)
       );
     }
 
+    // Sort after filtering
     sortProducts(productsCopy);
   };
 
   const sortProducts = (productsToSort) => {
     let sortedProducts = [...productsToSort];
+
     switch (sortType) {
       case "low-high":
         sortedProducts.sort((a, b) => a.price - b.price);
@@ -84,9 +85,12 @@ const Collection = () => {
       case "high-low":
         sortedProducts.sort((a, b) => b.price - a.price);
         break;
+      case "relevant":
       default:
+        // Do nothing, keep original filtered order
         break;
     }
+
     setFilterProducts(sortedProducts);
   };
 
@@ -97,7 +101,7 @@ const Collection = () => {
   }, [category, subCategory, search, showSearch, products]);
 
   useEffect(() => {
-    if (filterProducts.length > 0) {
+    if (filterProducts.length > 0 || sortType === "relevant") {
       sortProducts(filterProducts);
     }
   }, [sortType]);
@@ -112,7 +116,7 @@ const Collection = () => {
 
   return (
     <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t">
-      {/* Filters Options */}
+      {/* Filters */}
       <div className="min-w-60">
         <p
           onClick={() => setShowFilters(!showFilters)}
@@ -120,15 +124,13 @@ const Collection = () => {
         >
           FILTERS
           <img
-            className={`h-3 sm:hidden ${
-              showFilters ? "rotate-90" : "rotate-270"
-            }`}
+            className={`h-3 sm:hidden ${showFilters ? "rotate-90" : "rotate-270"}`}
             src={assets.dropdown_icon}
             alt=""
           />
         </p>
 
-        {/* Category Filter */}
+        {/* Category */}
         <div
           className={`border border-gray-300 pl-5 py-3 mt-6 rounded-sm ${
             showFilters ? "" : "hidden"
@@ -150,7 +152,7 @@ const Collection = () => {
           </div>
         </div>
 
-        {/* Subcategory Filter */}
+        {/* Subcategory */}
         <div
           className={`border border-gray-300 pl-5 py-3 mt-6 rounded-sm my-5 ${
             showFilters ? "" : "hidden"
@@ -173,25 +175,26 @@ const Collection = () => {
         </div>
       </div>
 
-      {/* Right Side */}
+      {/* Product Grid */}
       <div className="flex-1">
         <div className="flex justify-between text-base sm:text-2xl mb-4">
           <Title text1={"ALL"} text2={"COLLECTIONS"} />
 
-          {/* Product Sort Option */}
+          {/* Sorting Dropdown */}
           <div className="flex items-center text-base sm:text-2xl mb-4">
             <select
               onChange={(e) => setSortType(e.target.value)}
               className="border-2 border-gray-300 text-sm px-2 rounded-sm py-2 sm:py-3 text-gray-600"
+              value={sortType}
             >
-              <option value="relavent">Sort by: Relevant</option>
+              <option value="relevant">Sort by: Relevant</option>
               <option value="low-high">Sort by: Low to High</option>
               <option value="high-low">Sort by: High to Low</option>
             </select>
           </div>
         </div>
 
-        {/* Map Products */}
+        {/* Products Display */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
           {filterProducts.length === 0 ? (
             <p className="text-center text-lg sm:text-xl text-gray-400">
